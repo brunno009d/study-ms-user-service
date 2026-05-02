@@ -22,6 +22,14 @@ const getProfile = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
     try {
+        // Validar que hay datos para actualizar
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({
+                error: 'bad_request',
+                message: 'Se debe proporcionar al menos un campo para actualizar'
+            });
+        }
+
         const profile = await userService.updateProfile(req.userId, req.body);
 
         res.status(200).json({
@@ -30,19 +38,37 @@ const updateProfile = async (req, res, next) => {
             data: profile
         });
     } catch (error) {
+        // Manejar errores específicos del servicio
+        const statusCode = error.status || error.statusCode || 500;
+        if (statusCode === 400) {
+            return res.status(400).json({
+                error: 'bad_request',
+                message: error.message
+            });
+        }
+        if (statusCode === 404) {
+            return res.status(404).json({
+                error: 'not_found',
+                message: error.message || 'Perfil no encontrado'
+            });
+        }
         next(error);
     }
 };
 
 const deleteProfile = async (req, res, next) => {
     try {
-        const result = await userService.deleteAccount(req.userId);
+        await userService.deleteAccount(req.userId);
 
-        res.status(200).json({
-            status: 'success',
-            message: result.message
-        });
+        res.status(204).send();
     } catch (error) {
+        const statusCode = error.status || error.statusCode || 500;
+        if (statusCode === 404) {
+            return res.status(404).json({
+                error: 'not_found',
+                message: error.message || 'Cuenta no encontrada'
+            });
+        }
         next(error);
     }
 };
