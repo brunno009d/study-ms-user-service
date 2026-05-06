@@ -14,11 +14,7 @@ const register = async (req, res, next) => {
 
         const result = await userService.register(email, password, full_name);
 
-        res.status(201).json({
-            status: 'success',
-            message: 'Usuario registrado exitosamente',
-            data: result
-        });
+        res.status(201).json(result);
     } catch (error) {
         // Validación de email/contraseña del servicio
         if (error.status === 400) {
@@ -52,11 +48,7 @@ const login = async (req, res, next) => {
 
         const result = await userService.login(email, password);
 
-        res.status(200).json({
-            status: 'success',
-            message: 'Login exitoso',
-            data: result
-        });
+        res.status(200).json(result);
     } catch (error) {
         // Credenciales inválidas de Supabase
         if (error.message?.includes('Invalid login credentials')) {
