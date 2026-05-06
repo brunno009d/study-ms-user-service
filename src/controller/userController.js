@@ -4,10 +4,7 @@ const getProfile = async (req, res, next) => {
     try {
         const profile = await userService.getProfile(req.userId);
 
-        res.status(200).json({
-            status: 'success',
-            data: profile
-        });
+        res.status(200).json(profile);
     } catch (error) {
         // Perfil no encontrado en Supabase
         if (error.code === 'PGRST116') {
@@ -32,11 +29,7 @@ const updateProfile = async (req, res, next) => {
 
         const profile = await userService.updateProfile(req.userId, req.body);
 
-        res.status(200).json({
-            status: 'success',
-            message: 'Perfil actualizado exitosamente',
-            data: profile
-        });
+        res.status(200).json(profile);
     } catch (error) {
         // Manejar errores específicos del servicio
         const statusCode = error.status || error.statusCode || 500;
