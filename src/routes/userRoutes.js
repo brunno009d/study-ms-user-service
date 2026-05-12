@@ -10,8 +10,11 @@ router.use(requireAuth);
 // GET /profile — Obtener perfil del usuario autenticado
 router.get('/profile', userController.getProfile);
 
-// PUT /profile — Actualizar perfil
+// PUT /profile — Actualizar perfil completo
 router.put('/profile', userController.updateProfile);
+
+// PATCH /profile — Actualización parcial (avatar, tema, etc.)
+router.patch('/profile', userController.updateProfile);
 
 // DELETE /profile — Eliminar cuenta
 router.delete('/profile', userController.deleteProfile);
