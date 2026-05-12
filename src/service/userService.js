@@ -71,7 +71,7 @@ const getProfile = async (userId) => {
  */
 const updateProfile = async (userId, updates) => {
     // Solo permitir campos válidos
-    const allowedFields = ['full_name'];
+    const allowedFields = ['full_name', 'avatar_url', 'theme_color'];
     const filteredUpdates = {};
 
     for (const key of allowedFields) {
