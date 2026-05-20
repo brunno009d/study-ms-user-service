@@ -1,11 +1,15 @@
 const { Router } = require('express');
 const requireAuth = require('../middleware/requireAuth');
 const userController = require('../controller/userController');
+const aiContextController = require('../controller/aiContextController');
 
 const router = Router();
 
 // Todas las rutas de usuario requieren autenticación JWT
 router.use(requireAuth);
+
+// IA: Contexto completo del perfil (solo lectura)
+router.get('/ai-context', aiContextController.getContext);
 
 // GET /profile — Obtener perfil del usuario autenticado
 router.get('/profile', userController.getProfile);
