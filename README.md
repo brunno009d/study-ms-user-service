@@ -1,101 +1,142 @@
-# PopStudy - Microservicio de Usuarios (ps-ms-user-service)
+# PopStudy - User Microservice (`ps-ms-user-service`)
 
-Este microservicio se encarga de la gestión de usuarios, autenticación y perfiles dentro del ecosistema PopStudy. Utiliza Supabase Auth y Database para el manejo de identidades y persistencia de datos.
+Este microservicio forma parte del ecosistema de **PopStudy** y se encarga de la gestión de usuarios, autenticación, perfiles y contexto académico de los estudiantes. Está construido con **Node.js**, **Express** y se integra directamente con **Supabase** para la persistencia de datos y la verificación de la autenticación.
 
-## 🚀 Tecnologías
+---
 
-- **Node.js**: Entorno de ejecución para JavaScript.
-- **Express**: Framework web para la API.
-- **Supabase**: Backend-as-a-Service para base de datos y autenticación (PostgreSQL).
-- **JWT (JSON Web Tokens)**: Para la seguridad y autorización de rutas.
-- **Docker**: Para la contenedorización del servicio.
+## 🛠️ Tecnologías Utilizadas
 
-## 🗄️ Base de Datos
+- **Runtime:** Node.js (v18+)
+- **Framework Web:** Express.js (v5)
+- **Base de Datos:** PostgreSQL (alojado en Supabase)
+- **SDK:** `@supabase/supabase-js` (v2)
+- **Autenticación:** Supabase Auth (JWT via Bearer Tokens)
+- **Herramientas de Desarrollo:** Nodemon, Dotenv, Cors
 
-El servicio interactúa con la tabla `student` en Supabase.
-- **Trigger**: Se asume la existencia de un trigger `on_auth_user_created` en Supabase que crea automáticamente una entrada en la tabla `student` cuando un usuario se registra en Auth.
-- **Relación**: El `id` en la tabla `student` corresponde al `user_id` de Supabase Auth.
+---
 
-## 📋 Requisitos Previos
+## 📁 Estructura del Proyecto
 
-- [Node.js](https://nodejs.org/) (v18 o superior recomendado)
-- [Docker](https://www.docker.com/) (opcional, para despliegue)
-- Una cuenta en [Supabase](https://supabase.com/) con un proyecto configurado.
-
-## ⚙️ Configuración
-
-1. Clona el repositorio.
-2. Instala las dependencias:
-   ```bash
-   npm install
-   ```
-3. Crea un archivo `.env` basado en el `.env.example`:
-   ```bash
-   cp .env.example .env
-   ```
-4. Configura las variables de entorno en el archivo `.env`:
-   - `PORT`: Puerto donde correrá el servicio (ej. 3001).
-   - `SUPABASE_URL`: URL de tu proyecto en Supabase.
-   - `SUPABASE_SERVICE_ROLE`: Service Role Key para operaciones administrativas.
-
-## 🏃 Ejecución
-
-### Desarrollo
-Para iniciar el servicio con recarga automática:
-```bash
-npm run dev
-```
-
-### Producción
-Para iniciar el servicio en modo producción:
-```bash
-npm start
-```
-
-## 🐳 Docker
-
-Puedes construir y ejecutar el servicio usando Docker:
-
-```bash
-# Construir la imagen
-docker build -t ps-ms-user-service .
-
-# Ejecutar el contenedor
-docker run -p 3001:3001 --env-file .env ps-ms-user-service
-```
-
-## 🛣️ API Endpoints
-
-El microservicio está diseñado para trabajar detrás de un API Gateway. Internamente, las rutas se montan en `/`.
-
-### Salud del Sistema
-- `GET /health`: Verifica el estado del servicio.
-
-### Autenticación
-- `POST /register`: Registra un nuevo estudiante.
-- `POST /login`: Inicia sesión y devuelve un token JWT.
-
-### Perfil de Usuario (Requiere Auth JWT)
-- `GET /profile`: Obtiene la información del perfil del usuario autenticado.
-- `PUT /profile`: Actualiza los datos del perfil.
-- `DELETE /profile`: Elimina la cuenta del usuario.
-
-## 📂 Estructura del Proyecto
+El microservicio sigue un diseño limpio estructurado en capas:
 
 ```text
 ps-ms-user-service/
 ├── src/
-│   ├── config/      # Configuración de clientes (Supabase, etc.)
-│   ├── controller/  # Lógica de manejo de peticiones HTTP
-│   ├── middleware/  # Middlewares (Auth, Error handling)
-│   ├── repository/  # Acceso directo a la base de datos
-│   ├── routes/      # Definición de rutas Express
-│   ├── service/     # Lógica de negocio
-│   └── app.js       # Configuración central de Express
-├── index.js         # Punto de entrada del servidor
-├── Dockerfile       # Configuración de Docker
-└── package.json     # Dependencias y scripts
+│   ├── config/          # Configuración de clientes (Supabase)
+│   ├── controller/      # Controladores que manejan las peticiones HTTP
+│   ├── middleware/      # Middlewares (autenticación, manejo de errores)
+│   ├── repository/      # Capa de acceso a datos (queries a Supabase)
+│   ├── routes/          # Definición de rutas del API
+│   ├── service/         # Lógica de negocio
+│   └── app.js           # Configuración general del Express App
+├── index.js             # Punto de entrada del servidor
+├── Dockerfile           # Configuración de Docker para producción
+├── .env.example         # Plantilla de variables de entorno
+└── package.json         # Dependencias y scripts del proyecto
 ```
+
+---
+
+## 🗄️ Base de Datos
+
+El servicio interactúa con las siguientes tablas en Supabase:
+
+- **`auth.users`**: Tabla de autenticación manejada por Supabase Auth (registro e inicio de sesión).
+- **`student`**: Tabla de perfil del estudiante que almacena información adicional del usuario.
+  - **Trigger**: Se asume la existencia de un trigger `on_auth_user_created` que crea automáticamente una entrada en la tabla `student` cuando un usuario se registra en Auth.
+  - **Relación**: El `id` en la tabla `student` corresponde al `user_id` de Supabase Auth.
+
+---
+
+## ⚙️ Configuración del Entorno
+
+Para ejecutar el servicio localmente, crea un archivo `.env` en la raíz del proyecto basándote en `.env.example`:
+
+```env
+# --- CONFIGURACIÓN GENERAL ---
+PORT=3001
+NODE_ENV=development
+
+# --- SUPABASE (Secrets) ---
+SUPABASE_URL=tu_supabase_url
+SUPABASE_SERVICE_ROLE=tu_supabase_service_role
+```
+
+### Explicación de Variables:
+- **`PORT`**: Puerto local donde se levantará el servidor (por defecto `3001`).
+- **`NODE_ENV`**: Entorno de ejecución (`development` o `production`).
+- **`SUPABASE_URL`**: URL del proyecto de tu base de datos Supabase.
+- **`SUPABASE_SERVICE_ROLE`**: Clave Service Role (Service Key) para interactuar de forma segura con la base de datos saltándose políticas RLS cuando corresponda.
+
+---
+
+## 🚀 Instrucciones de Ejecución
+
+### Ejecución Local
+
+1. Instalar las dependencias:
+   ```bash
+   npm install
+   ```
+
+2. Correr en modo desarrollo (con recarga automática mediante Nodemon):
+   ```bash
+   npm run dev
+   ```
+
+3. Correr en modo producción:
+   ```bash
+   npm start
+   ```
+
+### Ejecución con Docker
+
+Puedes compilar y ejecutar el contenedor usando el `Dockerfile` provisto:
+
+1. Construir la imagen de Docker:
+   ```bash
+   docker build -t ps-ms-user-service .
+   ```
+
+2. Ejecutar el contenedor:
+   ```bash
+   docker run -p 3001:3001 --env-file .env ps-ms-user-service
+   ```
+
+---
+
+## 🛣️ Endpoints de la API
+
+El microservicio está diseñado para trabajar detrás de un API Gateway. Los endpoints principales son:
+
+### Salud del Sistema
+- `GET /health` - Verifica el estado del servicio.
+
+### Autenticación
+- `POST /register` - Registra un nuevo estudiante en el sistema.
+- `POST /login` - Inicia sesión y devuelve un token JWT.
+
+### Perfil de Usuario (Requiere Auth JWT)
+- `GET /profile` - Obtiene la información del perfil del usuario autenticado.
+- `PUT /profile` - Actualiza los datos del perfil.
+- `DELETE /profile` - Elimina la cuenta del usuario.
+
+### Contexto Académico (Requiere Auth JWT)
+- `GET /context` - Obtiene el contexto académico del estudiante (información complementaria).
+
+---
+
+## 🔐 Autenticación
+
+Todas las rutas del microservicio (excepto `GET /health`, `POST /register` y `POST /login`) requieren autenticación obligatoria.
+
+El microservicio utiliza el middleware `requireAuth` que valida el token JWT emitido por Supabase Auth. El token debe incluirse en el header `Authorization` con el formato:
+
+```
+Authorization: Bearer <token_jwt>
+```
+
+---
 
 ## 📄 Licencia
 
