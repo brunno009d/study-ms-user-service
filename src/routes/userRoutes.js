@@ -1,26 +1,16 @@
-const { Router } = require('express');
-const requireAuth = require('../middleware/requireAuth');
-const userController = require('../controller/userController');
-const aiContextController = require('../controller/aiContextController');
+import { Router } from 'express'
+import requireAuth from '../middleware/requireAuth.js'
+import { getProfile, updateProfile, deleteProfile } from '../controller/userController.js'
+import { getContext } from '../controller/aiContextController.js'
 
-const router = Router();
+const router = Router()
 
-// Todas las rutas de usuario requieren autenticación JWT
-router.use(requireAuth);
+router.use(requireAuth)
 
-// IA: Contexto completo del perfil (solo lectura)
-router.get('/ai-context', aiContextController.getContext);
+router.get('/ai-context', getContext)
+router.get('/profile', getProfile)
+router.put('/profile', updateProfile)
+router.patch('/profile', updateProfile)
+router.delete('/profile', deleteProfile)
 
-// GET /profile — Obtener perfil del usuario autenticado
-router.get('/profile', userController.getProfile);
-
-// PUT /profile — Actualizar perfil completo
-router.put('/profile', userController.updateProfile);
-
-// PATCH /profile — Actualización parcial (avatar, tema, etc.)
-router.patch('/profile', userController.updateProfile);
-
-// DELETE /profile — Eliminar cuenta
-router.delete('/profile', userController.deleteProfile);
-
-module.exports = router;
+export default router
