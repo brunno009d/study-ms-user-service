@@ -1,19 +1,13 @@
-const userService = require('../service/userService');
+import * as userService from '../service/userService.js'
 
-
-
-// Devuelve el perfil completo del estudiante autenticado.
-const getContext = async (req, res, next) => {
+export const getContext = async (req, res, next) => {
     try {
-        const profile = await userService.getProfile(req.userId);
-        res.status(200).json(profile);
+        const profile = await userService.getProfile(req.userId)
+        res.status(200).json(profile)
     } catch (error) {
-        // Si el perfil no existe, devolvemos null en vez de 404
         if (error.code === 'PGRST116') {
-            return res.status(200).json(null);
+            return res.status(200).json(null)
         }
-        next(error);
+        next(error)
     }
-};
-
-module.exports = { getContext };
+}
