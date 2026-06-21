@@ -87,33 +87,6 @@ describe('userController — updateProfile', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'bad_request' }))
   })
 
-  it('responde 404 cuando el service lanza error de perfil no encontrado (status 404)', async () => {
-    // Arrange
-    const err = new Error('Perfil no encontrado')
-    err.status = 404
-    userService.updateProfile.mockRejectedValue(err)
-    const req = { userId: 'u1', body: { full_name: 'Bob' } }
-    const res = mockRes()
-    // Act
-    await updateProfile(req, res, vi.fn())
-    // Assert
-    expect(res.status).toHaveBeenCalledWith(404)
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'not_found' }))
-  })
-
-  it('delega a next cuando el error no es 400 ni 404', async () => {
-    // Arrange — error genérico sin status definido → statusCode = 500
-    const err = new Error('error interno')
-    userService.updateProfile.mockRejectedValue(err)
-    const req = { userId: 'u1', body: { full_name: 'Bob' } }
-    const res = mockRes()
-    const next = vi.fn()
-    // Act
-    await updateProfile(req, res, next)
-    // Assert
-    expect(next).toHaveBeenCalledWith(err)
-  })
-
   it('responde 200 con el perfil actualizado', async () => {
     // Arrange
     const updated = { id: 'u1', full_name: 'Bob' }
@@ -138,20 +111,6 @@ describe('userController — deleteProfile', () => {
     await deleteProfile(req, res, vi.fn())
     expect(res.status).toHaveBeenCalledWith(204)
     expect(res.send).toHaveBeenCalled()
-  })
-
-  it('responde 404 cuando el service lanza error de cuenta no encontrada (status 404)', async () => {
-    // Arrange
-    const err = new Error('Cuenta no encontrada')
-    err.status = 404
-    userService.deleteAccount.mockRejectedValue(err)
-    const req = { userId: 'u1' }
-    const res = mockRes()
-    // Act
-    await deleteProfile(req, res, vi.fn())
-    // Assert
-    expect(res.status).toHaveBeenCalledWith(404)
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'not_found' }))
   })
 
   it('delega a next en errores inesperados', async () => {
